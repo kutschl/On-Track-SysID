@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="update_rate" default="50" />
+    <arg name="racecar_version" default="SIM"/>
+    <arg name="odom_topic" default="/car_state/odom" />
+    <arg name="ackermann_drive_topic" default="/drive" />
+    <arg name="save_LUT_name" default="TEST" />
+    <arg name="plot_model" default="True" />
+   
+    <node pkg="on_track_sys_id" exec="on_track_sys_id_node" name="on_track_sys_id_node" output="screen">
+        <param name="update_rate" value="$(var update_rate)" />
+        <param name="odom_topic" value="$(var odom_topic)" />
+        <param name="ackermann_drive_topic" value="$(var ackermann_drive_topic)" />
+        <param name="save_LUT_name" value="$(var save_LUT_name)" />
+        <param name="plot_model" value="$(var plot_model)" />
+        <param name="racecar_version" value="$(var racecar_version)" />
+    </node>
+</launch>
+

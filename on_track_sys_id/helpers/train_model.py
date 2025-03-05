@@ -6,17 +6,17 @@ import torch.nn as nn
 import yaml
 from scipy.signal import butter, filtfilt
 from torch.optim import Adam
-from helpers.generate_predictions import generate_predictions
-from helpers.generate_inputs_errors import generate_inputs_errors
-from helpers.SimpleNN import SimpleNN
-from helpers.pacejka_formula import pacejka_formula
-from helpers.plot_results import plot_results
-from helpers.solve_pacejka import solve_pacejka
-from helpers.save_model import save
-from helpers.load_model import get_dotdict
-from helpers.simulate_model import LookupGenerator
-import rospy
-import rospkg
+from on_track_sys_id.helpers.generate_predictions import generate_predictions
+from on_track_sys_id.helpers.generate_inputs_errors import generate_inputs_errors
+from on_track_sys_id.helpers.SimpleNN import SimpleNN
+from on_track_sys_id.helpers.pacejka_formula import pacejka_formula
+from on_track_sys_id.helpers.plot_results import plot_results
+from on_track_sys_id.helpers.solve_pacejka import solve_pacejka
+from on_track_sys_id.helpers.save_model import save
+from on_track_sys_id.helpers.load_model import get_dotdict
+from on_track_sys_id.helpers.simulate_model import LookupGenerator
+from ament_index_python.packages import get_package_share_directory
+
 from tqdm import tqdm
 
 def filter_data(training_data, model):
@@ -118,8 +118,7 @@ def get_model_param(racecar_version):
     Returns:
         dict: Model parameters including tire and vehicle properties.
     """
-    rospack = rospkg.RosPack()
-    package_path = rospack.get_path('on_track_sys_id')  # Replace with your package name
+    package_path = get_package_share_directory('on_track_sys_id') # Replace with your package name
     yaml_file = os.path.join(package_path, 'params/pacejka_params.yaml')
     with open(yaml_file, 'r') as file:
         pacejka_params = yaml.safe_load(file)
@@ -153,8 +152,7 @@ def get_nn_params():
     Returns:
         dict: Neural network parameters.
     """
-    rospack = rospkg.RosPack()
-    package_path = rospack.get_path('on_track_sys_id')  # Replace with your package name
+    package_path = get_package_share_directory('on_track_sys_id') # Replace with your package name
     yaml_file = os.path.join(package_path, 'params/nn_params.yaml')
     with open(yaml_file, 'r') as file:
         nn_params = yaml.safe_load(file)
@@ -247,7 +245,7 @@ def nn_train(training_data, racecar_version, save_LUT_name, plot_model):
                 print(f"C_Pr_identified at Iteration {i}:", C_Pr_identified)
                 
                 if plot_model:
-                    rospy.logwarn("Close the plot window (press Q) to continue... ")
+                    # rospy.logwarn("Close the plot window (press Q) to continue... ")
                     plot_results(model, v_x, v_y, omega, delta, C_Pf_identified, C_Pr_identified, i)   
                     
                 # Update model with identified coefficients
@@ -262,5 +260,5 @@ def nn_train(training_data, racecar_version, save_LUT_name, plot_model):
     save(car_model)
     
     # Generate Look-Up Table (LUT) with the updated model
-    rospy.loginfo("LUT is being generated...")
+    # rospy.loginfo("LUT is being generated...")
     LookupGenerator(racecar_version, save_LUT_name).run_generator()
